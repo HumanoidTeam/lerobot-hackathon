@@ -343,7 +343,7 @@ def eval_policy(
                     target=write_video,
                     args=(
                         str(video_path),
-                        stacked_frames[: done_index + 1],  # + 1 to capture the last observation
+                        np.array([item['top'] for item in stacked_frames[: done_index + 1]]),
                         env.unwrapped.metadata["render_fps"],
                     ),
                 )
