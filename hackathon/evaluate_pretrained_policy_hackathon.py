@@ -10,8 +10,8 @@ import torch
 import json
 
 from lerobot.scripts.eval import get_pretrained_policy_path
-
-from lerobot.common.policies.act.modeling_act import ACTPolicy
+from lerobot.common.policies.factory import make_policy
+from lerobot.common.utils.utils import init_hydra_config
 
 
 def run(pretratined_policy_path: Path | None = None,
@@ -23,7 +23,9 @@ def run(pretratined_policy_path: Path | None = None,
     device = torch.device("cpu" if device is None else device)
     pretrained_policy_path = Path(pretratined_policy_path)
 
-    policy = ACTPolicy.from_pretrained(pretrained_policy_path)
+    hydra_cfg = init_hydra_config(str(pretrained_policy_path / "config.yaml"))
+    policy = make_policy(hydra_cfg=hydra_cfg, pretrained_policy_name_or_path=str(pretrained_policy_path))
+
     policy.eval()
     policy.to(device)
 
@@ -63,7 +65,7 @@ def run(pretratined_policy_path: Path | None = None,
         num_videos_saved = 0
 
         for idx_rollout in range(num_rollouts_per_object):
-            policy.reset()  # TODO: this would be in the policy module if we decouple
+            policy.reset()
 
             numpy_observation, info = env.reset(seed=random_seed + idx_total,
                                                 options=env_options)

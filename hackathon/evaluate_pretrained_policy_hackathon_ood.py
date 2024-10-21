@@ -7,13 +7,11 @@ import gym_aloha
 import gymnasium as gym
 import imageio
 import numpy
-import numpy as np
 import torch
-from huggingface_hub import snapshot_download
 
 from lerobot.scripts.eval import get_pretrained_policy_path
-
-from lerobot.common.policies.act.modeling_act import ACTPolicy
+from lerobot.common.policies.factory import make_policy
+from lerobot.common.utils.utils import init_hydra_config
 
 
 def run(pretratined_policy_path: Path | None = None,
@@ -25,7 +23,9 @@ def run(pretratined_policy_path: Path | None = None,
     device = torch.device("cpu" if device is None else device)
     pretrained_policy_path = Path(pretratined_policy_path)
 
-    policy = ACTPolicy.from_pretrained(pretrained_policy_path)
+    hydra_cfg = init_hydra_config(str(pretrained_policy_path / "config.yaml"))
+    policy = make_policy(hydra_cfg=hydra_cfg, pretrained_policy_name_or_path=str(pretrained_policy_path))
+
     policy.eval()
     policy.to(device)
 
