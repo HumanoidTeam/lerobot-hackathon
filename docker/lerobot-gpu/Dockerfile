@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake \
     libglib2.0-0 libgl1-mesa-glx libegl1-mesa ffmpeg \
     libopengl0 \
+    git \
     speech-dispatcher \
     python${PYTHON_VERSION}-dev python${PYTHON_VERSION}-venv \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
