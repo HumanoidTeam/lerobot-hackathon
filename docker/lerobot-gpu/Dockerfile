@@ -9,6 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake \
     libglib2.0-0 libgl1-mesa-glx libegl1-mesa ffmpeg \
+    libopengl0 \
     speech-dispatcher \
     python${PYTHON_VERSION}-dev python${PYTHON_VERSION}-venv \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -22,9 +23,12 @@ RUN echo "source /opt/venv/bin/activate" >> /root/.bashrc
 
 # Install LeRobot
 COPY . /lerobot
+COPY docker/lerobot-gpu/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+
 WORKDIR /lerobot
 RUN pip install --upgrade --no-cache-dir pip
-RUN pip install --no-cache-dir ".[test, aloha, xarm, pusht, dynamixel]"
+RUN pip install --no-cache-dir ".[aloha]"
 
 # Set EGL as the rendering backend for MuJoCo
 ENV MUJOCO_GL="egl"
+ENV PYOPENGL_PLATFORM="egl" 
